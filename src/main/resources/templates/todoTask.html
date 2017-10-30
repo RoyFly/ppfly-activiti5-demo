@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta charset="UTF-8"/>
+    <title>我的待办（任务）页面/工作台页面</title>
+    <script th:src="@{/lib/js/jquery.js}"></script>
+    <script th:src="@{/lib/js/bootstrap.js}"></script>
+    <link rel="stylesheet" th:href="@{/lib/css/bootstrap.css}">
+    <script th:inline="javascript" th:fragment="js" language="JavaScript">
+        //签出
+        function claim(taskId, userName) {
+            window.location.href = "/task/claim/" + taskId + "?userName=" + userName;
+        }
+        //弹出处理（审核）页面
+        function deal(taskId, businessId, currentStatus, taskDefinitionKey, userName) {
+//            alert(currentStatus);
+//            alert(taskDefinitionKey);
+            if (1 == currentStatus && "LEAVE_TIAOZHENG" == taskDefinitionKey) {
+//                alert(1);
+                window.location.href = "/leave/goToReAskForLeave/" + taskId + "?businessId=" + businessId;//调整申请
+            } else {
+//                alert(2)
+                window.location.href = "/task/goToDeal/" + taskId + "?businessId=" + businessId + "&userName=" + userName;//审核
+            }
+        }
+    </script>
+</head>
+
+<body th:inline="text">
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title"><span th:text="${userName}"></span>的待办</h3>
+    </div>
+    <div class="box-body">
+        <table id="modelsTable" class="table table-bordered table-hover">
+            <thead>
+            <tr>
+                <th style="text-align: center;">申请人</th>
+                <th style="text-align: center;">申请时间</th>
+                <th style="text-align: center;">任务Id</th>
+                <th style="text-align: center;">流程实例Id</th>
+                <th style="text-align: center;">工单类型</th>
+                <th style="text-align: center;">任务名称</th>
+                <th style="text-align: center;">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <div th:if="${not #lists.isEmpty(workflowInfoList)}">
+                <tr style="text-align: center;" th:each="workflowInfo,numIndex:${workflowInfoList}">
+                    <td style="text-align: center;">[[${workflowInfo.initiator}]]</td>
+                    <td style="text-align: center;">
+                        [[${#dates.format(workflowInfo.createTime, 'yyyy-MM-dd HH:mm:ss')}]]
+                    </td>
+                    <td style="text-align: center;">[[${workflowInfo.taskId}]]</td>
+                    <td style="text-align: center;">[[${workflowInfo.processInstance.id}]]</td>
+                    <td style="text-align: center;">
+                        <div th:switch="${workflowInfo.workOrderType}">
+                            <div th:case="'dailyreports'">日报</div>
+                            <div th:case="'event'">事件</div>
+                            <div th:case="'leave'">请假</div>
+                        </div>
+                    </td>
+                    <td style="text-align: center;">[[${workflowInfo.currTaskDefinitionName}]]</td>
+                    <td style="text-align: center;">
+                        <a th:onclick="'javascript:claim(\''+${workflowInfo.taskId}+'\',\''+${userName}+'\');'"
+                           style="color: #337ab7;">签出</span>
+                        </a>
+                        <a th:onclick="'javascript:deal(\''+${workflowInfo.taskId}+'\',\''+${workflowInfo.id}+'\',\''
+                        +${workflowInfo.currentStatus}+'\',\''+${workflowInfo.currTaskDefinitionKey}+'\',\''+${userName}+'\');'"
+                           style="color: #337ab7;">处理</span>
+                        </a>
+                    </td>
+                </tr>
+            </div>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+
+</html>

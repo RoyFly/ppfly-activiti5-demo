@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef">
+  <process id="dailyReports" isExecutable="true">
+    <startEvent id="DAILY_START" activiti:initiator="applicant"></startEvent>
+    <subProcess id="SUB_PROCESS_DAILY" name="填报清单流程">
+      <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="${subProcessActivityService.resolveUsersForTask()}" activiti:elementVariable="assignee">
+        <completionCondition>${subProcessActivityService.isComplete(execution)}</completionCondition>
+      </multiInstanceLoopCharacteristics>
+      <startEvent id="SUB_DAILY_START"></startEvent>
+      <userTask id="FILL_IN_DAILY" name="组员填写日报" activiti:assignee="${assignee}"></userTask>
+      <userTask id="AUDIT_DAILY" name="组长审批" activiti:assignee="#{teamLeader}"></userTask>
+      <exclusiveGateway id="sid-10CDD79D-ECFE-47F5-8E22-090A6412F112"></exclusiveGateway>
+      <endEvent id="SUB_DAILY_END"></endEvent>
+      <userTask id="AMEND_DAILY" name="日报内容修正" activiti:assignee="${assignee}"></userTask>
+      <sequenceFlow id="sid-12483A4E-3C6D-4B70-A9DC-5679F700C134" sourceRef="SUB_DAILY_START" targetRef="FILL_IN_DAILY"></sequenceFlow>
+      <sequenceFlow id="sid-2EA39132-00D0-4ED6-BFD2-4E39CA2CDF24" sourceRef="FILL_IN_DAILY" targetRef="AUDIT_DAILY"></sequenceFlow>
+      <sequenceFlow id="sid-6CA9291E-E75F-49A6-BB05-72F6C48EA147" sourceRef="AUDIT_DAILY" targetRef="sid-10CDD79D-ECFE-47F5-8E22-090A6412F112"></sequenceFlow>
+      <sequenceFlow id="sid-1821BB3C-F4A4-406B-8F22-5B5F25ABB9AD" sourceRef="AMEND_DAILY" targetRef="AUDIT_DAILY"></sequenceFlow>
+      <sequenceFlow id="agree" name="通过" sourceRef="sid-10CDD79D-ECFE-47F5-8E22-090A6412F112" targetRef="SUB_DAILY_END">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${flag==0}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="disagree" name="不通过" sourceRef="sid-10CDD79D-ECFE-47F5-8E22-090A6412F112" targetRef="AMEND_DAILY">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${flag==1}]]></conditionExpression>
+      </sequenceFlow>
+    </subProcess>
+    <sequenceFlow id="sid-FCBC2670-ED1E-4D0A-A748-91C85DEC8979" sourceRef="DAILY_START" targetRef="SUB_PROCESS_DAILY"></sequenceFlow>
+    <userTask id="GATHER_DAILY" name="项目经理汇总日报" activiti:assignee="${applicant}"></userTask>
+    <endEvent id="DAILY_END"></endEvent>
+    <sequenceFlow id="sid-91F0875E-453B-4891-A02E-F3EA1D54B533" sourceRef="GATHER_DAILY" targetRef="DAILY_END"></sequenceFlow>
+    <sequenceFlow id="sid-CA3F3221-47C8-451D-AD89-F1C2AAF145E6" sourceRef="SUB_PROCESS_DAILY" targetRef="GATHER_DAILY"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_dailyReports">
+    <bpmndi:BPMNPlane bpmnElement="dailyReports" id="BPMNPlane_dailyReports">
+      <bpmndi:BPMNShape bpmnElement="DAILY_START" id="BPMNShape_DAILY_START">
+        <omgdc:Bounds height="30.0" width="30.0" x="30.0" y="174.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="SUB_PROCESS_DAILY" id="BPMNShape_SUB_PROCESS_DAILY">
+        <omgdc:Bounds height="289.0" width="730.0" x="120.0" y="45.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="SUB_DAILY_START" id="BPMNShape_SUB_DAILY_START">
+        <omgdc:Bounds height="30.0" width="30.0" x="180.0" y="89.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="FILL_IN_DAILY" id="BPMNShape_FILL_IN_DAILY">
+        <omgdc:Bounds height="80.0" width="100.0" x="270.0" y="64.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="AUDIT_DAILY" id="BPMNShape_AUDIT_DAILY">
+        <omgdc:Bounds height="80.0" width="100.0" x="465.0" y="64.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-10CDD79D-ECFE-47F5-8E22-090A6412F112" id="BPMNShape_sid-10CDD79D-ECFE-47F5-8E22-090A6412F112">
+        <omgdc:Bounds height="40.0" width="40.0" x="675.0" y="84.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="SUB_DAILY_END" id="BPMNShape_SUB_DAILY_END">
+        <omgdc:Bounds height="28.0" width="28.0" x="780.0" y="90.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="AMEND_DAILY" id="BPMNShape_AMEND_DAILY">
+        <omgdc:Bounds height="80.0" width="100.0" x="465.0" y="210.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="GATHER_DAILY" id="BPMNShape_GATHER_DAILY">
+        <omgdc:Bounds height="80.0" width="100.0" x="915.0" y="149.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="DAILY_END" id="BPMNShape_DAILY_END">
+        <omgdc:Bounds height="28.0" width="28.0" x="1065.0" y="175.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sid-12483A4E-3C6D-4B70-A9DC-5679F700C134" id="BPMNEdge_sid-12483A4E-3C6D-4B70-A9DC-5679F700C134">
+        <omgdi:waypoint x="210.0" y="104.5"></omgdi:waypoint>
+        <omgdi:waypoint x="270.0" y="104.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-FCBC2670-ED1E-4D0A-A748-91C85DEC8979" id="BPMNEdge_sid-FCBC2670-ED1E-4D0A-A748-91C85DEC8979">
+        <omgdi:waypoint x="60.0" y="189.5"></omgdi:waypoint>
+        <omgdi:waypoint x="120.0" y="189.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="disagree" id="BPMNEdge_disagree">
+        <omgdi:waypoint x="695.0" y="124.5"></omgdi:waypoint>
+        <omgdi:waypoint x="695.0" y="250.0"></omgdi:waypoint>
+        <omgdi:waypoint x="565.0" y="250.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-6CA9291E-E75F-49A6-BB05-72F6C48EA147" id="BPMNEdge_sid-6CA9291E-E75F-49A6-BB05-72F6C48EA147">
+        <omgdi:waypoint x="565.0" y="104.5"></omgdi:waypoint>
+        <omgdi:waypoint x="675.0" y="104.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-CA3F3221-47C8-451D-AD89-F1C2AAF145E6" id="BPMNEdge_sid-CA3F3221-47C8-451D-AD89-F1C2AAF145E6">
+        <omgdi:waypoint x="850.0" y="189.5"></omgdi:waypoint>
+        <omgdi:waypoint x="915.0" y="189.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="agree" id="BPMNEdge_agree">
+        <omgdi:waypoint x="714.8994974874372" y="104.39949748743719"></omgdi:waypoint>
+        <omgdi:waypoint x="780.0001785497931" y="104.07070616894043"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-2EA39132-00D0-4ED6-BFD2-4E39CA2CDF24" id="BPMNEdge_sid-2EA39132-00D0-4ED6-BFD2-4E39CA2CDF24">
+        <omgdi:waypoint x="370.0" y="104.5"></omgdi:waypoint>
+        <omgdi:waypoint x="465.0" y="104.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-1821BB3C-F4A4-406B-8F22-5B5F25ABB9AD" id="BPMNEdge_sid-1821BB3C-F4A4-406B-8F22-5B5F25ABB9AD">
+        <omgdi:waypoint x="515.0" y="210.0"></omgdi:waypoint>
+        <omgdi:waypoint x="515.0" y="144.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-91F0875E-453B-4891-A02E-F3EA1D54B533" id="BPMNEdge_sid-91F0875E-453B-4891-A02E-F3EA1D54B533">
+        <omgdi:waypoint x="1015.0" y="189.5"></omgdi:waypoint>
+        <omgdi:waypoint x="1065.0" y="189.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

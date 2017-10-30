@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta charset="UTF-8"/>
+    <title>已结束流程页面</title>
+    <script th:src="@{/lib/js/jquery.js}"></script>
+    <script th:src="@{/lib/js/bootstrap.js}"></script>
+    <link rel="stylesheet" th:href="@{/lib/css/bootstrap.css}">
+</head>
+
+<body th:inline="text">
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">已结束流程</h3>
+    </div>
+    <div class="box-body">
+        <table id="modelsTable" class="table table-bordered table-hover">
+            <thead>
+            <tr>
+                <th style="text-align: center;">流程实例Id</th>
+                <th style="text-align: center;">流程定义Id</th>
+                <th style="text-align: center;">流程定义Key</th>
+                <th style="text-align: center;">流程部署Id</th>
+                <th style="text-align: center;">业务Id</th>
+                <th style="text-align: center;">发起人</th>
+                <th style="text-align: center;">发起流程时间</th>
+                <th style="text-align: center;">流程结束时间</th>
+                <th style="text-align: center;">流程持续时长（ms）</th>
+            </tr>
+            </thead>
+            <tbody>
+            <div th:if="${not #lists.isEmpty(historicProcessInstanceList)}">
+                <tr style="text-align: center;"
+                    th:each="historicProcessInstance,numIndex:${historicProcessInstanceList}">
+                    <td style="text-align: center;">[[${historicProcessInstance.processInstanceId}]]</td>
+                    <td style="text-align: center;">[[${historicProcessInstance.processDefinitionId}]]</td>
+                    <td style="text-align: center;">[[${historicProcessInstance.processDefinitionKey}]]</td>
+                    <td style="text-align: center;">[[${historicProcessInstance.deploymentId}]]</td>
+                    <td style="text-align: center;">[[${historicProcessInstance.businessKey}]]</td>
+                    <td style="text-align: center;">[[${historicProcessInstance.startUserId}]]</td>
+                    <td style="text-align: center;">
+                        [[${#dates.format(historicProcessInstance.startTime, 'yyyy-MM-dd HH:mm:ss')}]]
+                    </td>
+                    <td style="text-align: center;">
+                        [[${#dates.format(historicProcessInstance.endTime, 'yyyy-MM-dd HH:mm:ss')}]]
+                    </td>
+                    <td style="text-align: center;">[[${historicProcessInstance.durationInMillis}]]</td>
+                </tr>
+            </div>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+
+</html>

@@ -1,0 +1,30 @@
+spring:
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+    encoding: UTF-8
+    content-type: text/html
+#    mode: HTML5
+    mode: LEGACYHTML5
+  application:
+    name: ppfly-activiti-demo
+  datasource:
+    url: jdbc:mysql://192.168.42.1:3306/ppfly_activiti_demo?useUnicode=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&autoReconnectForPools=true
+    username: tjfae
+    password: tjfae
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  activiti:
+    process-definition-location-prefix: classpath:/processDefLoc/
+security:
+  basic:
+    enabled: false
+server:
+  port: 8083
+
+
+
+

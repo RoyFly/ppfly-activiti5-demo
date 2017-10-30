@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef">
+  <process id="leave" isExecutable="true">
+    <extensionElements>
+      <activiti:executionListener event="start" class="com.ppfly.demo.common.listener.GlobalExecutionListenerImpl"></activiti:executionListener>
+      <activiti:executionListener event="end" class="com.ppfly.demo.common.listener.GlobalExecutionListenerImpl"></activiti:executionListener>
+      <activiti:eventListener events="ACTIVITY_STARTED" delegateExpression="${activitiEventListener}"></activiti:eventListener>
+      <activiti:eventListener events="ACTIVITY_COMPLETED" delegateExpression="${activitiEventListener}"></activiti:eventListener>
+      <activiti:eventListener events="TASK_ASSIGNED" delegateExpression="${activitiEventListener}"></activiti:eventListener>
+      <activiti:eventListener events="TASK_COMPLETED" delegateExpression="${activitiEventListener}"></activiti:eventListener>
+    </extensionElements>
+    <startEvent id="LEAVE_MULTI_START" activiti:initiator="applicant"></startEvent>
+    <userTask id="LEAVE_BUMEN" name="部门领导审核" activiti:assignee="${assignee}">
+      <extensionElements>
+        <activiti:taskListener event="create" delegateExpression="${taskListenerImpl3}"></activiti:taskListener>
+        <activiti:taskListener event="assignment" delegateExpression="${taskListenerImpl3}"></activiti:taskListener>
+        <activiti:taskListener event="complete" delegateExpression="${taskListenerImpl3}"></activiti:taskListener>
+        <activiti:taskListener event="delete" delegateExpression="${taskListenerImpl3}"></activiti:taskListener>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="${multiInstanceActivityService.resolveUsersForTask()}" activiti:elementVariable="assignee">
+        <completionCondition>${multiInstanceActivityService.isComplete(execution)}</completionCondition>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+    <sequenceFlow id="sid-2B75363E-6716-4FAF-B12A-B0CDDD6931CD" sourceRef="LEAVE_MULTI_START" targetRef="LEAVE_BUMEN"></sequenceFlow>
+    <exclusiveGateway id="sid-76A09E1B-FDDB-43C1-A92C-CDEE752784BC"></exclusiveGateway>
+    <sequenceFlow id="sid-21D9D8D2-6604-4DC6-8896-B793AFD79B41" sourceRef="LEAVE_BUMEN" targetRef="sid-76A09E1B-FDDB-43C1-A92C-CDEE752784BC"></sequenceFlow>
+    <userTask id="LEAVE_RENSHI" name="人事审核">
+      <extensionElements>
+        <activiti:taskListener event="create" delegateExpression="${taskListenerWithSetAssignee}"></activiti:taskListener>
+        <activiti:taskListener event="assignment" delegateExpression="${taskListenerWithSetAssignee}"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="LEAVE_TIAOZHENG" name="调整申请" activiti:assignee="${applicant}"></userTask>
+    <userTask id="LEAVE_LINGDAO" name="公司领导审核 ">
+      <extensionElements>
+        <activiti:taskListener event="create" delegateExpression="${taskListenerWithAddCandidateUsers}"></activiti:taskListener>
+        <activiti:taskListener event="assignment" delegateExpression="${taskListenerWithAddCandidateUsers}"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <endEvent id="LEAVE_MULTI_END"></endEvent>
+    <sequenceFlow id="sid-8FA0469D-BFAA-40E4-8B4C-C15A4B40D9CE" sourceRef="LEAVE_LINGDAO" targetRef="LEAVE_MULTI_END"></sequenceFlow>
+    <exclusiveGateway id="sid-7D44ED3B-2588-4BB8-914D-A7956C6C9871"></exclusiveGateway>
+    <endEvent id="LEAVE_MULTI_END2"></endEvent>
+    <sequenceFlow id="sid-5F0533B5-8F72-44B4-B3BB-C8D9A6D31B09" sourceRef="LEAVE_RENSHI" targetRef="LEAVE_LINGDAO"></sequenceFlow>
+    <sequenceFlow id="sid-8D8E817E-4A97-455F-A75B-A99E9BD665F9" sourceRef="LEAVE_TIAOZHENG" targetRef="sid-7D44ED3B-2588-4BB8-914D-A7956C6C9871"></sequenceFlow>
+    <sequenceFlow id="noReApply" sourceRef="sid-7D44ED3B-2588-4BB8-914D-A7956C6C9871" targetRef="LEAVE_BUMEN">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reApply==0}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="disagree" name="不通过" sourceRef="sid-76A09E1B-FDDB-43C1-A92C-CDEE752784BC" targetRef="LEAVE_TIAOZHENG">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${flag==1}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="reApply" sourceRef="sid-7D44ED3B-2588-4BB8-914D-A7956C6C9871" targetRef="LEAVE_MULTI_END2">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reApply==1}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="agree" name="通过" sourceRef="sid-76A09E1B-FDDB-43C1-A92C-CDEE752784BC" targetRef="LEAVE_RENSHI">
+      <extensionElements>
+        <activiti:executionListener event="take" class="com.ppfly.demo.common.listener.GlobalExecutionListenerImpl"></activiti:executionListener>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${flag==0}]]></conditionExpression>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_leave">
+    <bpmndi:BPMNPlane bpmnElement="leave" id="BPMNPlane_leave">
+      <bpmndi:BPMNShape bpmnElement="LEAVE_MULTI_START" id="BPMNShape_LEAVE_MULTI_START">
+        <omgdc:Bounds height="30.0" width="30.0" x="45.0" y="90.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="LEAVE_BUMEN" id="BPMNShape_LEAVE_BUMEN">
+        <omgdc:Bounds height="80.0" width="100.0" x="150.0" y="65.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-76A09E1B-FDDB-43C1-A92C-CDEE752784BC" id="BPMNShape_sid-76A09E1B-FDDB-43C1-A92C-CDEE752784BC">
+        <omgdc:Bounds height="40.0" width="40.0" x="360.0" y="85.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="LEAVE_RENSHI" id="BPMNShape_LEAVE_RENSHI">
+        <omgdc:Bounds height="80.0" width="100.0" x="510.0" y="65.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="LEAVE_TIAOZHENG" id="BPMNShape_LEAVE_TIAOZHENG">
+        <omgdc:Bounds height="80.0" width="100.0" x="330.0" y="195.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="LEAVE_LINGDAO" id="BPMNShape_LEAVE_LINGDAO">
+        <omgdc:Bounds height="80.0" width="100.0" x="705.0" y="65.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="LEAVE_MULTI_END" id="BPMNShape_LEAVE_MULTI_END">
+        <omgdc:Bounds height="28.0" width="28.0" x="900.0" y="91.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-7D44ED3B-2588-4BB8-914D-A7956C6C9871" id="BPMNShape_sid-7D44ED3B-2588-4BB8-914D-A7956C6C9871">
+        <omgdc:Bounds height="40.0" width="40.0" x="360.0" y="330.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="LEAVE_MULTI_END2" id="BPMNShape_LEAVE_MULTI_END2">
+        <omgdc:Bounds height="28.0" width="28.0" x="540.0" y="336.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sid-5F0533B5-8F72-44B4-B3BB-C8D9A6D31B09" id="BPMNEdge_sid-5F0533B5-8F72-44B4-B3BB-C8D9A6D31B09">
+        <omgdi:waypoint x="610.0" y="105.0"></omgdi:waypoint>
+        <omgdi:waypoint x="705.0" y="105.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="noReApply" id="BPMNEdge_noReApply">
+        <omgdi:waypoint x="360.0" y="350.0"></omgdi:waypoint>
+        <omgdi:waypoint x="200.0" y="350.0"></omgdi:waypoint>
+        <omgdi:waypoint x="200.0" y="145.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-2B75363E-6716-4FAF-B12A-B0CDDD6931CD" id="BPMNEdge_sid-2B75363E-6716-4FAF-B12A-B0CDDD6931CD">
+        <omgdi:waypoint x="75.0" y="105.0"></omgdi:waypoint>
+        <omgdi:waypoint x="150.0" y="105.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-21D9D8D2-6604-4DC6-8896-B793AFD79B41" id="BPMNEdge_sid-21D9D8D2-6604-4DC6-8896-B793AFD79B41">
+        <omgdi:waypoint x="250.0" y="105.0"></omgdi:waypoint>
+        <omgdi:waypoint x="360.0" y="105.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-8FA0469D-BFAA-40E4-8B4C-C15A4B40D9CE" id="BPMNEdge_sid-8FA0469D-BFAA-40E4-8B4C-C15A4B40D9CE">
+        <omgdi:waypoint x="805.0" y="105.0"></omgdi:waypoint>
+        <omgdi:waypoint x="900.0" y="105.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-8D8E817E-4A97-455F-A75B-A99E9BD665F9" id="BPMNEdge_sid-8D8E817E-4A97-455F-A75B-A99E9BD665F9">
+        <omgdi:waypoint x="380.0" y="275.0"></omgdi:waypoint>
+        <omgdi:waypoint x="380.0" y="330.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="reApply" id="BPMNEdge_reApply">
+        <omgdi:waypoint x="400.0" y="350.0"></omgdi:waypoint>
+        <omgdi:waypoint x="540.0" y="350.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="disagree" id="BPMNEdge_disagree">
+        <omgdi:waypoint x="380.0" y="125.0"></omgdi:waypoint>
+        <omgdi:waypoint x="380.0" y="195.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="agree" id="BPMNEdge_agree">
+        <omgdi:waypoint x="400.0" y="105.0"></omgdi:waypoint>
+        <omgdi:waypoint x="510.0" y="105.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

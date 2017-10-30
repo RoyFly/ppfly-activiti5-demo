@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta charset="UTF-8"/>
+    <title>申告事件</title>
+</head>
+<script th:src="@{/lib/js/jquery.js}"></script>
+<link rel="stylesheet" th:href="@{/lib/css/font-awesome.css}">
+<script th:src="@{/lib/js/bootstrap.js}"></script>
+<link rel="stylesheet" th:href="@{/lib/css/bootstrap.css}">
+<script th:src="@{/lib/js/bootstrap-datetimepicker.js}"></script>
+<link rel="stylesheet" th:href="@{/lib/css/bootstrap-datetimepicker.css}">
+<script th:inline="javascript" th:fragment="js" language="JavaScript">
+    $(function () {
+        $('#startTime').datetimepicker({
+            format: 'yyyy-mm-dd hh:mm',
+            language: 'zh-CN',//显示中文
+            initialDate: new Date(),//初始化当前日期
+            autoclose: true,
+            todayBtn: true,
+            pickerPosition: "bottom-left"
+        });
+    })
+</script>
+<body>
+<div class="box box-info">
+    <div class="box-header with-border">
+        <h3 class="box-title">事件申告</h3>
+    </div>
+
+    <form class="form-horizontal" th:action="@{/event/declareEvent}" method="post"
+          enctype="multipart/form-data" id="form_declareEvent" th:object="${eventPO}">
+
+        <div class="box-body" style="">
+            <div class="form-group">
+                <div class="col-md-3 text-right">
+                    <label for="initiator" class="control-label">发起人：</label>
+                </div>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="initiator" th:field="*{initiator}"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-3 text-right">
+                    <label for="eventCode" class="control-label">事件编码：</label>
+                </div>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="eventCode" th:field="*{eventCode}"/>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <div class="col-md-3 text-right">
+                    <label for="title" class="control-label">事件标题：</label>
+                </div>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="title" th:field="*{title}"/>
+                    <!--<span class="star">※</span>-->
+                    <div class="error" th:errors="${eventPO.title}"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-3 text-right">
+                    <label for="eventDesc" class="control-label">事件描述</label>
+                </div>
+                <div class="col-md-9">
+                    <textarea class="form-control" rows="3" id="eventDesc" th:field="*{eventDesc}"></textarea>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-3 text-right">
+                    <label for="exceptedSolutionTime" class="control-label">期望解决时间：</label>
+                </div>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="exceptedSolutionTime"
+                           th:field="*{exceptedSolutionTime}"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-3 text-right">
+                    <label for="importanceDegree" class="control-label">重要度：</label>
+                </div>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="importanceDegree" th:field="*{importanceDegree}"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-3 text-right">
+                    <label for="priority" class="control-label">优先级：</label>
+                </div>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="priority" th:field="*{priority}"/>
+                </div>
+            </div>
+
+
+            <div class="box-footer text-center">
+                <button class="btn btn-info" type="submit">事件申告</button>
+            </div>
+
+        </div>
+    </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta charset="UTF-8"/>
+    <title>activiti欢迎页面</title>
+    <script th:src="@{/lib/js/jquery.js}"></script>
+    <script th:src="@{/lib/js/bootstrap.js}"></script>
+    <link rel="stylesheet" th:href="@{/lib/css/bootstrap.css}">
+    <script th:inline="javascript" th:fragment="js" language="JavaScript">
+        //删除模型
+        function deleteModel(modelId) {
+            if (window.confirm('确定删除该模型' + modelId + '？')) {
+                $.ajax({
+                    url: '/models/' + modelId,
+                    type: 'DELETE',
+                    success: function (result) {
+                        if ("success" == result) {
+                            window.location.href = "/";
+                        }
+                    }
+                });
+            }
+        }
+        //我的待办(任务)
+        function scanTaskList() {
+            var userName = $("#userName").val();
+            window.location.href = "/todoTaskList/" + userName;
+        }
+    </script>
+</head>
+<body th:inline="text">
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">新建一个空模型</h3>
+    </div>
+    <div class="box-body">
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a th:href="@{/goToCreateNewModel}" style="color: #337ab7;">新建</span></a>
+    </div>
+</div>
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">获取所有模型列表</h3>
+    </div>
+    <div class="box-body">
+        <table id="modelList" class="table table-bordered table-hover">
+            <thead>
+            <tr>
+                <th style="text-align: center;">序号</th>
+                <th style="text-align: center;">id</th>
+                <th style="text-align: center;">name</th>
+                <th style="text-align: center;">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <div th:if="${not #lists.isEmpty(models)}">
+                <tr style="text-align: center;" th:each="model,numIndex:${models}">
+                    <td style="text-align: center;" th:text="${numIndex.index+1}"></td>
+                    <td style="text-align: center;"><span th:text="${model.id}"></span></td>
+                    <td style="text-align: center;">[[${model.name}]]</td>
+                    <td>
+                        <span>
+                            <a th:href="@{/goToDiagramPage(modelId=${model.id})}" style="color: #337ab7;">
+                                在线流程设计：[[${model.id}]]
+                            </a>
+                        </span>|
+                        <span>
+                             <a th:href="@{'/models/'+${model.id}+'/deployment'}" style="color: #337ab7;">
+                                 发布模型为流程定义：[[${model.id}]]
+                             </a>
+                        </span>|
+                        <span>
+                             <a th:onclick="'javascript:deleteModel(\''+${model.id}+'\');'" style="color: #337ab7;">
+                                删除模型：[[${model.id}]]
+                             </a>
+                        </span>
+                    </td>
+                </tr>
+            </div>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">操作</h3>
+    </div>
+    <div class="box-body">
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a th:href="@{/leave/goToAskForLeave}" style="color: #337ab7;">请假</span></a>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a th:href="@{/event/goToDeclareEvent}" style="color: #337ab7;">申告事件</span></a>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a th:href="@{/dailyReports/goToOriginatingDaily}" style="color: #337ab7;">发起日报任务</span></a>
+    </div>
+</div>
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">任务&流程</h3>
+    </div>
+    <div class="box-body">
+
+
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active">
+                <a href="#task" aria-controls="task" role="tab" data-toggle="tab">任务</a>
+            </li>
+            <li role="presentation">
+                <a href="#process" aria-controls="process" role="tab" data-toggle="tab">流程</a>
+            </li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="task">
+                <table id="taskList" class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th style="text-align: left;">用户名</th>
+                        <th style="text-align: center;">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td style="text-align: left;">
+                            <input type="text" id="userName" name="userName" value="zhangsan">
+                        </td>
+                        <td>
+                            <a th:onclick="'javascript:scanTaskList();'" style="color: #337ab7;">我的待办(任务)</span></a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="process">
+                <table id="processList" class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th style="text-align: center;">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td style="text-align: center;">
+                            <a th:href="@{/getProcessDefinitionList}" style="color: #337ab7;">（所有）流程定义列表</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center;">
+                            <a th:href="@{/getRunningProcessInstanceList}" style="color: #337ab7;">运行中的流程</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center;">
+                            <a th:href="@{/getFinishedProcessInstanceList}" style="color: #337ab7;">已结束的流程</span></a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

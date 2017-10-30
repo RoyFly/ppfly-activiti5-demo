@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta charset="UTF-8"/>
+    <title>运行中的流程页面</title>
+    <script th:src="@{/lib/js/jquery.js}"></script>
+    <script th:src="@{/lib/js/bootstrap.js}"></script>
+    <link rel="stylesheet" th:href="@{/lib/css/bootstrap.css}">
+</head>
+
+<body th:inline="text">
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">运行中的流程</h3>
+    </div>
+    <div class="box-body">
+        <table id="modelsTable" class="table table-bordered table-hover">
+            <thead>
+            <tr>
+                <th style="text-align: center;">流程实例Id</th>
+                <th style="text-align: center;">流程定义Id</th>
+                <th style="text-align: center;">流程定义版本</th>
+                <th style="text-align: center;">业务Id</th>
+            </tr>
+            </thead>
+            <tbody>
+            <div th:if="${not #lists.isEmpty(processInstanceList)}">
+                <tr style="text-align: center;" th:each="processInstance,numIndex:${processInstanceList}">
+                    <td style="text-align: center;">[[${processInstance.id}]]</td>
+                    <td style="text-align: center;">[[${processInstance.processDefinitionId}]]</td>
+                    <td style="text-align: center;">[[${processInstance.processDefinitionVersion}]]</td>
+                    <td style="text-align: center;">[[${processInstance.businessKey}]]</td>
+                </tr>
+            </div>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+
+</html>
