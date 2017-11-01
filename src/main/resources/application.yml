@@ -5,14 +5,13 @@ spring:
     suffix: .html
     encoding: UTF-8
     content-type: text/html
-#    mode: HTML5
     mode: LEGACYHTML5
   application:
     name: ppfly-activiti-demo
   datasource:
-    url: jdbc:mysql://192.168.42.1:3306/ppfly_activiti_demo?useUnicode=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&autoReconnectForPools=true
-    username: tjfae
-    password: tjfae
+    url: jdbc:mysql://127.0.0.1:3306/ppfly_activiti_demo?useUnicode=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&autoReconnectForPools=true
+    username: root
+    password: 123456
   jpa:
     hibernate:
       ddl-auto: update
